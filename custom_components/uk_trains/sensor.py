@@ -26,6 +26,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         calling_at = query.get(CONF_DESTINATION, '')
         sensors.append(
             RttIoLiveTrainTimeSensor(
+                hass,
                 config.get(CONF_API_USERNAME),
                 config.get(CONF_API_PASSWORD),
                 station_code,
@@ -49,7 +50,7 @@ class RttIoSensor(SensorEntity):
     _attr_icon = "mdi:train"
     _attr_native_unit_of_measurement = TIME_MINUTES
 
-    def __init__(self, name, api_username, api_password, url):
+    def __init__(self, hass, name, api_username, api_password, url):
         """Initialize the sensor."""
         self._data = {}
         self._api_username = api_username
@@ -57,6 +58,8 @@ class RttIoSensor(SensorEntity):
         self._url = TRANSPORT_API_URL_BASE + url
         self._name = name
         self._state = None
+        self._attr_available = False
+        self.hass = hass
 
     @property
     def name(self):
@@ -70,6 +73,7 @@ class RttIoSensor(SensorEntity):
 
     def _do_api_request(self):
         """Perform an API request."""
+        self._data = {}
         response = requests.get(self._url, auth=(self._api_username, self._api_password))
         if response.status_code == 401:
             self._state = "Credentials invalid"
@@ -86,7 +90,7 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
 
     _attr_icon = "mdi:train"
 
-    def __init__(self, api_username, api_password, station_code, calling_at, interval):
+    def __init__(self, hass, api_username, api_password, station_code, calling_at, interval):
         """Construct a live train time sensor."""
         self._station_code = station_code
         self._calling_at = calling_at
@@ -100,12 +104,14 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
             sensor_name = f"Trains from {station_code}"
 
         RttIoSensor.__init__(
-            self, sensor_name, api_username, api_password, query_url
+            self, hass, sensor_name, api_username, api_password, query_url
         )
         self.update = Throttle(interval)(self._update)
 
     def _update(self):
         """Get the latest live departure data for the specified stop."""
+
+        logging.warn('_update')
 
         self._do_api_request()
         self._next_trains = []
@@ -113,6 +119,7 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
         if self._data != {}:
             if self._data["services"] is None or len(self._data["services"]) == 0:
                 self._state = "No departures"
+                self._attr_available = False
             else:
                 for departure in self._data["services"]:
                     if departure.get('plannedCancel', False):
@@ -130,14 +137,17 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
                     )
                     # times need to be properly formatted
                     for key in ['destination_time', 'scheduled', 'estimated']:
-                        self._next_trains[-1][key] = self._next_trains[-1][key][:2] + ':' + self._next_trains[-1][key][2:]
+                        if len(self._next_trains[-1][key]) == 4:
+                            self._next_trains[-1][key] = self._next_trains[-1][key][:2] + ':' + self._next_trains[-1][key][2:]
 
                 if self._next_trains:
+                    self._attr_available = True
                     self._state = min(
                         _delta_mins(train["scheduled"]) for train in self._next_trains
                     )
                 else:
                     self._state = None
+                    self._attr_available = False
 
     @property
     def extra_state_attributes(self):

@@ -1,0 +1,93 @@
+{
+    "location": {
+        "name": "Sevenoaks",
+        "crs": "SEV",
+        "tiploc": "SVNOAKS",
+        "country": "gb",
+        "system": "nr"
+    },
+    "filter": {
+        "destination": {
+            "name": "London Bridge",
+            "crs": "LBG",
+            "tiploc": [
+                "LNDNBDC",
+                "LNDNBDE",
+                "LNDNBDG"
+            ],
+            "country": "gb",
+            "system": "nr"
+        }
+    },
+    "services": [
+        {
+            "locationDetail": {
+                "tiploc": "SVNOAKS",
+                "gbttBookedArrival": "0456",
+                "gbttBookedDeparture": "0457",
+                "origin": [
+                    {
+                        "tiploc": "TONBDG",
+                        "description": "Tonbridge",
+                        "workingTime": "044500",
+                        "publicTime": "0445"
+                    }
+                ],
+                "destination": [
+                    {
+                        "tiploc": "CHRX",
+                        "description": "London Charing Cross",
+                        "workingTime": "054300",
+                        "publicTime": "0545"
+                    }
+                ],
+                "isCall": true,
+                "isPublicCall": true,
+                "platform": "1",
+                "displayAs": "CALL"
+            },
+            "serviceUid": "G83169",
+            "runDate": "2021-10-15",
+            "trainIdentity": "1Y02",
+            "runningIdentity": "1Y02",
+            "atocCode": "SE",
+            "atocName": "Southeastern",
+            "serviceType": "train",
+            "isPassenger": true
+        },
+        {
+            "locationDetail": {
+                "tiploc": "SVNOAKS",
+                "gbttBookedDeparture": "0532",
+                "origin": [
+                    {
+                        "tiploc": "SVNOAKS",
+                        "description": "Sevenoaks",
+                        "workingTime": "053200",
+                        "publicTime": "0532"
+                    }
+                ],
+                "destination": [
+                    {
+                        "tiploc": "CHRX",
+                        "description": "London Charing Cross",
+                        "workingTime": "062600",
+                        "publicTime": "0626"
+                    }
+                ],
+                "isCall": true,
+                "isPublicCall": true,
+                "platform": "2",
+                "displayAs": "ORIGIN"
+            },
+            "serviceUid": "G83470",
+            "runDate": "2021-10-15",
+            "trainIdentity": "2F06",
+            "runningIdentity": "2F06",
+            "atocCode": "SE",
+            "atocName": "Southeastern",
+            "serviceType": "train",
+            "isPassenger": true
+        }
+    ]
+}

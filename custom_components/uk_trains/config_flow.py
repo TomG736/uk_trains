@@ -1,5 +1,6 @@
 from copy import deepcopy
 from typing import Any, Dict, Optional
+from homeassistant.data_entry_flow import FlowResult
 
 import homeassistant.helpers.config_validation as cv
 import requests
@@ -35,7 +36,9 @@ async def validate_stations(username, password, orig, dest):
 class RTTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Example config flow."""
 
-    async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None):
+    VERSION = 1
+
+    async def async_step_user(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
         """Invoked when a user initiates a flow via the user interface."""
         errors: Dict[str, str] = {}
         if user_input is not None:
@@ -54,7 +57,7 @@ class RTTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             step_id="user", data_schema=AUTH_SCHEMA, errors=errors
         )
 
-    async def async_step_journey(self, user_input: Optional[Dict[str, Any]] = None):
+    async def async_step_journey(self, user_input: Optional[Dict[str, Any]] = None) -> FlowResult:
         """Second step in config flow to add a journey."""
         errors: Dict[str, str] = {}
         if user_input is not None:
