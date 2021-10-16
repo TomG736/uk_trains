@@ -1,0 +1,11 @@
+{
+  "codeowners": ["@TomG736"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/TomG736/uk_trains",
+  "domain": "uk_trains",
+  "iot_class": "cloud_polling",
+  "name": "UK Trains",
+  "requirements": [],
+  "version": "0.0.1"
+}
