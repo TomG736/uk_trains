@@ -10,7 +10,7 @@ steps:
 - name: python
   image: python:3.9
   commands:
-    - apt update && apt install libffi
+    - apt update && apt install libffi-dev
     - pip3 install -r requirements.test.txt --extra-index-url https://www.piwheels.org/simple
     - pytest
     - flake8 custom_components tests
