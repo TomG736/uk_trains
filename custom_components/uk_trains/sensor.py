@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 import homeassistant.util.dt as dt_util
 import requests
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import HTTP_OK, TIME_MINUTES
+from homeassistant.const import HTTP_UNAUTHORIZED, HTTP_OK, TIME_MINUTES
 from homeassistant.util import Throttle
 
 from .const import (ATTR_CALLING_AT, ATTR_NEXT_TRAINS, ATTR_STATION_CODE,
@@ -75,7 +75,7 @@ class RttIoSensor(SensorEntity):
         """Perform an API request."""
         self._data = {}
         response = requests.get(self._url, auth=(self._api_username, self._api_password))
-        if response.status_code == 401:
+        if response.status_code == HTTP_UNAUTHORIZED:
             self._state = "Credentials invalid"
         elif response.status_code != HTTP_OK:
             _LOGGER.warning(f"Invalid response from API: {response.status_code}: {self._url}")
@@ -98,7 +98,7 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
 
         if len(calling_at) > 0:
             query_url = f"{station_code}/to/{calling_at}"
-            sensor_name = f"Next train to {calling_at}"
+            sensor_name = f"Next train to {calling_at} from {station_code}"
         else:
             query_url = f"{station_code}"
             sensor_name = f"Trains from {station_code}"
@@ -124,6 +124,8 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
                 for departure in self._data["services"]:
                     if departure.get('plannedCancel', False):
                         continue
+                    if not 'locationDetail' in departure:
+                        continue
                     self._next_trains.append(
                         {
                             "origin_name": departure['locationDetail']['origin'][0]['description'],
@@ -131,7 +133,7 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
                             "destination_time": departure['locationDetail']['destination'][0]['publicTime'],
                             "scheduled": departure['locationDetail']['gbttBookedDeparture'],
                             "estimated": departure['locationDetail'].get('realtimeDeparture', ''),
-                            "platform": departure['locationDetail']["platform"],
+                            "platform": departure['locationDetail'].get('platform', ''),
                             "operator_name": departure["atocName"],
                         }
                     )
