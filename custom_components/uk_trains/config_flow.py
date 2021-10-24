@@ -21,13 +21,13 @@ AUTH_SCHEMA = {
 }
 
 
-async def validate_auth(username, password, hass):
+async def validate_auth(username, password, hass=None):
     response = requests.get(TRANSPORT_API_URL_BASE + 'EUS', auth=(username, password))
     if response.status_code != HTTP_OK:
         raise ValueError('Auth Failed')
 
 
-async def validate_stations(username, password, orig, dest):
+async def validate_stations(username, password, orig, dest, hass=None):
     response = requests.get(TRANSPORT_API_URL_BASE + orig + (f"/to/{dest}" if dest else ''), auth=(username, password))
     if response.status_code != HTTP_OK:
         raise ValueError('Failed')

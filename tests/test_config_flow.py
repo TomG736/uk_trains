@@ -1,50 +1,44 @@
 """Tests for the config flow."""
 from unittest import mock
 
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_NAME, CONF_PATH
+from homeassistant.const import CONF_ACCESS_TOKEN, CONF_NAME, CONF_PATH, HTTP_FORBIDDEN, HTTP_OK
 import pytest
-from pytest_homeassistant_custom_component.plugins import patch
-from pytest_homeassistant_custom_component.common import MockConfigEntry, AsyncMock
 from homeassistant.config_entries import SOURCE_USER
 from homeassistant import data_entry_flow
 
 from custom_components.uk_trains import config_flow
-from custom_components.uk_trains.const import DOMAIN
+from custom_components.uk_trains.const import DOMAIN, TRANSPORT_API_URL_BASE
+
+async def test_validate_auth_valid(hass, requests_mock):
+    """Test no exception is raised for valid auth."""
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_OK)
+    
+    await config_flow.validate_auth("token", "password", hass)
 
 
-# @patch("custom_components.github_custom.config_flow.RTTConfigFlow")
-# async def test_validate_path_valid(m_github, hass):
-#     """Test no exception is raised for a valid path."""
-#     m_instance = AsyncMock()
-#     m_instance.getitem = AsyncMock()
-#     m_github.return_value = m_instance
-#     await config_flow.validate_path("home-assistant/core", "access-token", hass)
+async def test_validate_auth_invalid(hass, requests_mock):
+    """Test no exception is raised for valid auth."""
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_FORBIDDEN)
+    with pytest.raises(ValueError):
+        await config_flow.validate_auth("token", "password", hass)
+
+async def test_validate_stations_valid(hass, requests_mock):
+    """Test no exception is raised for valid auth."""
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_OK)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS/to/HML', text='', status_code=HTTP_OK)
+    
+    await config_flow.validate_stations("token", "password", 'EUS', None, hass)
+    await config_flow.validate_stations("token", "password", 'EUS', 'HML', hass)
 
 
-# async def test_validate_path_invalid(hass):
-#     """Test a ValueError is raised when the path is not valid."""
-#     for bad_path in ("home-assistant", "home-assistant/core/foo"):
-#         with pytest.raises(ValueError):
-#             await config_flow.validate_path(bad_path, "access-token", hass)
-
-
-# @patch("custom_components.github_custom.config_flow.GitHubAPI")
-# async def test_validate_auth_valid(m_github, hass):
-#     """Test no exception is raised for valid auth."""
-#     m_instance = AsyncMock()
-#     m_instance.getitem = AsyncMock()
-#     m_github.return_value = m_instance
-#     await config_flow.validate_auth("token", hass)
-
-
-# @patch("custom_components.github_custom.config_flow.GitHubAPI")
-# async def test_validate_auth_invalid(m_github, hass):
-#     """Test ValueError is raised when auth is invalid."""
-#     m_instance = AsyncMock()
-#     m_instance.getitem = AsyncMock(side_effect=BadRequest(AsyncMock()))
-#     m_github.return_value = m_instance
-#     with pytest.raises(ValueError):
-#         await config_flow.validate_auth("token", hass)
+async def test_validate_stations_invalid(hass, requests_mock):
+    """Test no exception is raised for valid auth."""
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_FORBIDDEN)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS/to/HML', text='', status_code=HTTP_FORBIDDEN)
+    with pytest.raises(ValueError):
+        await config_flow.validate_stations("token", "password", 'EUS', None, hass)
+    with pytest.raises(ValueError):
+        await config_flow.validate_stations("token", "password", 'EUS', 'HML', hass)
 
 
 # async def test_flow_user_init(hass):
