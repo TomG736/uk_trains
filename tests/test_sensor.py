@@ -1,24 +1,17 @@
 """Tests for the sensor module."""
 
+from homeassistant.const import HTTP_OK, HTTP_UNAUTHORIZED
+from custom_components.uk_trains.const import TRANSPORT_API_URL_BASE
 from custom_components.uk_trains import sensor
 #from requests import Response
 import json
 
-class mock:
-    pass
-class Response:
-    pass
-
-async def test_async_update_success(hass):
+async def test_async_update_success(hass, requests_mock):
     """Tests a fully successful async_update."""
 
-    sensor.requests = mock()
-    resp = Response()
+    # TODO move to using requests_mock
     with open('tests/testdata/success.json') as fd:
-        resp.content = json.load(fd)
-    resp.json = lambda: resp.content
-    resp.status_code = 200
-    sensor.requests.get = lambda url=None, auth=None, c=None: resp
+        requests_mock.get(TRANSPORT_API_URL_BASE + 'origin/to/dest', text=fd.read(), status_code=HTTP_OK)
 
     custom_sensor = sensor.RttIoLiveTrainTimeSensor(hass, 'username', 'password', 'origin', 'dest', 10)
     await custom_sensor.async_device_update()
@@ -144,15 +137,17 @@ async def test_async_update_success(hass):
     assert custom_sensor.available is True
 
 
-async def test_async_update_failed(hass):
+async def test_async_update_failed(hass, requests_mock):
     """Tests a failed async_update."""
-    sensor.requests = mock()
-    resp = Response()
-    with open('tests/testdata/success.json') as fd:
-        resp.content = json.load(fd)
-    resp.json = lambda: resp.content
-    resp.status_code = 401
-    sensor.requests.get = lambda url=None, auth=None, c=None: resp
+    # sensor.requests = mock()
+    # resp = Response()
+    # with open('tests/testdata/success.json') as fd:
+    #     resp.content = json.load(fd)
+    # resp.json = lambda: resp.content
+    # resp.status_code = 401
+    # sensor.requests.get = lambda url=None, auth=None, c=None: resp
+    
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'origin/to/dest', text='', status_code=HTTP_UNAUTHORIZED)
     
     custom_sensor = sensor.RttIoLiveTrainTimeSensor(hass, 'username', 'password', 'origin', 'dest', 10)
     await custom_sensor.async_device_update()
