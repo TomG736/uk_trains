@@ -1,43 +1,43 @@
 {
-    "config": {
-      "error": {
-        "auth": "The username and password provided are not valid.",
-        "invalid_stations": "The stations provided are not valid. They should be in the CRS or TIPLOC format. See https://www.nationalrail.co.uk/stations_destinations/48541.aspx"
-      },
-      "step": {
-        "user": {
-          "data": {
-            "username": "Username",
-            "password": "Password"
-          },
-          "description": "Enter your API Auth Credentials.",
-          "title": "Authentication"
-        },
-        "journey": {
-          "data": {
-            "add_another": "Add another journey?",
-            "origin": "Origin station.",
-            "destination": "Destination (optional)."
-          },
-          "description": "Add a journey, check the box to add another.",
-          "title": "Add Journey"
-        }
-      }
+  "config": {
+    "error": {
+      "auth": "The username and password provided are not valid.",
+      "invalid_stations": "The stations provided are not valid. They should be in the CRS or TIPLOC format. See https://www.nationalrail.co.uk/stations_destinations/48541.aspx"
     },
-    "options": {
-      "error": {
-        "invalid_stations": "The stations provided are not valid. They should be in the CRS or TIPLOC format. See https://www.nationalrail.co.uk/stations_destinations/48541.aspx"
+    "step": {
+      "user": {
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        },
+        "description": "Enter your API Auth Credentials.",
+        "title": "Authentication"
       },
-      "step": {
-        "init": {
-          "title": "Manage Journeys",
-          "data": {
-            "journeys": "Existing Journeys: Uncheck any journeys you want to remove.",
-            "path": "New Journey: Origin station.",
-            "name": "New Journey: Destination (optional)."
-          },
-          "description": "Remove existing journeys or add a new journey."
-        }
+      "journey": {
+        "data": {
+          "add_another": "Add another journey?",
+          "origin": "Origin station.",
+          "destination": "Destination (optional)."
+        },
+        "description": "Add a journey, check the box to add another.",
+        "title": "Add Journey"
+      }
+    }
+  },
+  "options": {
+    "error": {
+      "invalid_stations": "The stations provided are not valid. They should be in the CRS or TIPLOC format. See https://www.nationalrail.co.uk/stations_destinations/48541.aspx"
+    },
+    "step": {
+      "init": {
+        "title": "Manage Journeys",
+        "data": {
+          "journeys": "Existing Journeys: Uncheck any journeys you want to remove.",
+          "path": "New Journey: Origin station.",
+          "name": "New Journey: Destination (optional)."
+        },
+        "description": "Remove existing journeys or add a new journey."
       }
     }
   }
+}

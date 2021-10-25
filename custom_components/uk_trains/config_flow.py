@@ -15,10 +15,12 @@ from .const import (_QUERY_SCHEME, CONF_API_PASSWORD, CONF_API_USERNAME,
                     CONF_DESTINATION, CONF_ORIGIN, CONF_QUERIES, DOMAIN,
                     TRANSPORT_API_URL_BASE)
 
-AUTH_SCHEMA = {
-    vol.Required(CONF_API_USERNAME): cv.string,
-    vol.Required(CONF_API_PASSWORD): cv.string,
-}
+AUTH_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_API_USERNAME): cv.string,
+        vol.Required(CONF_API_PASSWORD): cv.string,
+    }
+)
 
 
 async def validate_auth(username, password, hass=None):
