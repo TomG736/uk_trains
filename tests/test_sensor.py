@@ -139,13 +139,6 @@ async def test_async_update_success(hass, requests_mock):
 
 async def test_async_update_failed(hass, requests_mock):
     """Tests a failed async_update."""
-    # sensor.requests = mock()
-    # resp = Response()
-    # with open('tests/testdata/success.json') as fd:
-    #     resp.content = json.load(fd)
-    # resp.json = lambda: resp.content
-    # resp.status_code = 401
-    # sensor.requests.get = lambda url=None, auth=None, c=None: resp
     
     requests_mock.get(TRANSPORT_API_URL_BASE + 'origin/to/dest', text='', status_code=HTTP_UNAUTHORIZED)
     
