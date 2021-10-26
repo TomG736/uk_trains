@@ -1,6 +1,7 @@
 """Support for UK public transport data provided by www.realtimetrains.co.uk."""
 import logging
 from datetime import datetime, timedelta
+from homeassistant import config_entries, core
 
 import homeassistant.util.dt as dt_util
 import requests
@@ -10,7 +11,7 @@ from homeassistant.util import Throttle
 
 from .const import (ATTR_CALLING_AT, ATTR_NEXT_TRAINS, ATTR_STATION_CODE,
                     CONF_API_PASSWORD, CONF_API_USERNAME, CONF_DESTINATION,
-                    CONF_ORIGIN, CONF_QUERIES, TRANSPORT_API_URL_BASE)
+                    CONF_ORIGIN, CONF_QUERIES, DOMAIN, TRANSPORT_API_URL_BASE)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,6 +38,61 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     add_entities(sensors, True)
 
+
+
+async def async_setup_entry(
+    hass: core.HomeAssistant,
+    config_entry: config_entries.ConfigEntry,
+    async_add_entities,
+):
+    """Setup sensors from a config entry created in the integrations UI."""
+    config = hass.data[DOMAIN][config_entry.entry_id]
+    # Update our config to include new repos and remove those that have been removed.
+    if config_entry.options:
+        config.update(config_entry.options)
+    sensors = []
+    number_sensors = len(config.get(CONF_QUERIES))
+    interval = timedelta(seconds=87 * number_sensors)
+    for query in config.get(CONF_QUERIES):
+        station_code = query.get(CONF_ORIGIN)
+        calling_at = query.get(CONF_DESTINATION, '')
+        sensors.append(
+            RttIoLiveTrainTimeSensor(
+                hass,
+                config.get(CONF_API_USERNAME),
+                config.get(CONF_API_PASSWORD),
+                station_code,
+                calling_at,
+                interval,
+            )
+        )
+    async_add_entities(sensors, update_before_add=True)
+
+
+async def async_setup_platform(
+    hass,
+    config,
+    async_add_entities,
+    discovery_info=None,
+) -> None:
+    """Set up the sensor platform."""
+    sensors = []
+    number_sensors = len(config.get(CONF_QUERIES))
+    interval = timedelta(seconds=87 * number_sensors)
+    for query in config.get(CONF_QUERIES):
+        station_code = query.get(CONF_ORIGIN)
+        calling_at = query.get(CONF_DESTINATION, '')
+        sensors.append(
+            RttIoLiveTrainTimeSensor(
+                hass,
+                config.get(CONF_API_USERNAME),
+                config.get(CONF_API_PASSWORD),
+                station_code,
+                calling_at,
+                interval,
+            )
+        )
+    async_add_entities(sensors, update_before_add=True)
 
 class RttIoSensor(SensorEntity):
     """
