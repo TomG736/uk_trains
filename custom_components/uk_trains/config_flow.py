@@ -23,14 +23,14 @@ AUTH_SCHEMA = vol.Schema(
 )
 
 
-async def validate_auth(username, password, hass):
-    response = await hass.async_add_executor_job(requests.get, TRANSPORT_API_URL_BASE + 'EUS', auth=(username, password))
+def validate_auth(username, password, hass=None):
+    response = requests.get(TRANSPORT_API_URL_BASE + 'EUS', auth=(username, password))
     if response.status_code != HTTP_OK:
         raise ValueError('Auth Failed')
 
 
-async def validate_stations(username, password, orig, dest, hass):
-    response = await hass.async_add_executor_job(requests.get, TRANSPORT_API_URL_BASE + orig + (f"/to/{dest}" if dest else ''), auth=(username, password))
+def validate_stations(username, password, orig, dest, hass):
+    response = requests.get(TRANSPORT_API_URL_BASE + orig + (f"/to/{dest}" if dest else ''), auth=(username, password))
     if response.status_code != HTTP_OK:
         raise ValueError('Failed')
 
@@ -45,7 +45,7 @@ class RTTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         errors: Dict[str, str] = {}
         if user_input is not None:
             try:
-                await validate_auth(user_input[CONF_API_USERNAME], user_input[CONF_API_PASSWORD], self.hass)
+                await self.hass.async_add_executor_job(validate_auth, user_input[CONF_API_USERNAME], user_input[CONF_API_PASSWORD])
             except ValueError:
                 errors["base"] = "auth"
             if not errors:
@@ -65,7 +65,7 @@ class RTTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Validate the path.
             try:
-                await validate_stations(self.data[CONF_API_USERNAME], self.data[CONF_API_PASSWORD], user_input[CONF_ORIGIN], user_input.get(CONF_DESTINATION, None), self.hass)
+                await self.hass.async_add_executor_job( validate_stations, self.data[CONF_API_USERNAME], self.data[CONF_API_PASSWORD], user_input[CONF_ORIGIN], user_input.get(CONF_DESTINATION, None), self.hass)
             except ValueError:
                 errors["base"] = "invalid_stations"
 
@@ -146,7 +146,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                     CONF_API_PASSWORD
                 ]
                 try:
-                    await validate_stations(username, password, user_input[CONF_ORIGIN], user_input.get(CONF_DESTINATION, ''), self.hass)
+                    await self.hass.async_add_executor_job(validate_stations, username, password, user_input[CONF_ORIGIN], user_input.get(CONF_DESTINATION, ''), self.hass)
                 except ValueError:
                     errors["base"] = "invalid_path"
 

@@ -13,22 +13,22 @@ async def test_validate_auth_valid(hass, requests_mock):
     """Test no exception is raised for valid auth."""
     requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_OK)
     
-    await config_flow.validate_auth("token", "password", hass)
+    config_flow.validate_auth("token", "password", hass)
 
 
 async def test_validate_auth_invalid(hass, requests_mock):
     """Test no exception is raised for valid auth."""
     requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_FORBIDDEN)
     with pytest.raises(ValueError):
-        await config_flow.validate_auth("token", "password", hass)
+        config_flow.validate_auth("token", "password", hass)
 
 async def test_validate_stations_valid(hass, requests_mock):
     """Test no exception is raised for valid auth."""
     requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_OK)
     requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS/to/HML', text='', status_code=HTTP_OK)
     
-    await config_flow.validate_stations("token", "password", 'EUS', None, hass)
-    await config_flow.validate_stations("token", "password", 'EUS', 'HML', hass)
+    config_flow.validate_stations("token", "password", 'EUS', None, hass)
+    config_flow.validate_stations("token", "password", 'EUS', 'HML', hass)
 
 
 async def test_validate_stations_invalid(hass, requests_mock):
@@ -36,9 +36,9 @@ async def test_validate_stations_invalid(hass, requests_mock):
     requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_FORBIDDEN)
     requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS/to/HML', text='', status_code=HTTP_FORBIDDEN)
     with pytest.raises(ValueError):
-        await config_flow.validate_stations("token", "password", 'EUS', None, hass)
+        config_flow.validate_stations("token", "password", 'EUS', None, hass)
     with pytest.raises(ValueError):
-        await config_flow.validate_stations("token", "password", 'EUS', 'HML', hass)
+        config_flow.validate_stations("token", "password", 'EUS', 'HML', hass)
 
 
 # async def test_flow_user_init(hass):
