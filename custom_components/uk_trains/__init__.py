@@ -7,7 +7,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(
-    hass: core.HomeAssistant, entry: config_entries.ConfigEntry, async_add_devices
+    hass: core.HomeAssistant, entry: config_entries.ConfigEntry, async_add_devices=None
 ) -> bool:
     """Set up platform from a ConfigEntry."""
     hass.data.setdefault(DOMAIN, {})
