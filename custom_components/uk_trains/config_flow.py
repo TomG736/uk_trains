@@ -24,13 +24,13 @@ AUTH_SCHEMA = vol.Schema(
 
 
 async def validate_auth(username, password, hass):
-    response = await hass.async_add_executor_job(requests.get(TRANSPORT_API_URL_BASE + 'EUS', auth=(username, password)))
+    response = await hass.async_add_executor_job(requests.get, TRANSPORT_API_URL_BASE + 'EUS', auth=(username, password))
     if response.status_code != HTTP_OK:
         raise ValueError('Auth Failed')
 
 
 async def validate_stations(username, password, orig, dest, hass):
-    response = await hass.async_add_executor_job(requests.get(TRANSPORT_API_URL_BASE + orig + (f"/to/{dest}" if dest else ''), auth=(username, password)))
+    response = await hass.async_add_executor_job(requests.get, TRANSPORT_API_URL_BASE + orig + (f"/to/{dest}" if dest else ''), auth=(username, password))
     if response.status_code != HTTP_OK:
         raise ValueError('Failed')
 
