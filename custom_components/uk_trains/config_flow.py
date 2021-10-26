@@ -86,7 +86,7 @@ class RTTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return self.async_create_entry(title="RTT Train Info", data=self.data)
 
         return self.async_show_form(
-            step_id="journey", data_schema=_QUERY_SCHEME.append({
+            step_id="journey", data_schema=_QUERY_SCHEME.extend({
                 vol.Optional("add_another"): cv.boolean
             }), errors=errors
         )
