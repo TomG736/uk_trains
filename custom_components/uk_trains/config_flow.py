@@ -164,6 +164,12 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
             if not errors:
                 # Value of data will be set on the options property of our config_entry
                 # instance.
+                if user_input.get("add_another", False):
+                    await self.async_create_entry(
+                        title="",
+                        data={CONF_QUERIES: updated_journeys},
+                    )
+                    return await self.async_step_init()
                 return self.async_create_entry(
                     title="",
                     data={CONF_QUERIES: updated_journeys},
@@ -176,6 +182,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 ),
                 vol.Optional(CONF_ORIGIN): cv.string,
                 vol.Optional(CONF_DESTINATION): cv.string,
+                vol.Optional("add_another"): cv.boolean
             }
         )
         return self.async_show_form(
