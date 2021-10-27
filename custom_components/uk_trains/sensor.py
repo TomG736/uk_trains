@@ -178,7 +178,7 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
         if self._data != {}:
             if self._data["services"] is None or len(self._data["services"]) == 0:
                 self._state = "No departures"
-                self._attr_available = False
+                self._attr_available = True
             else:
                 for departure in self._data["services"]:
                     if departure.get('plannedCancel', False):
