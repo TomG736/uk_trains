@@ -20,3 +20,10 @@ steps:
   commands:
     - pip3 install pipdeptree==1.0.0 stdlib-list==0.7.0 tqdm==4.48.2
     - bashio ./drone/hassfest.sh
+
+- name: result
+  commands:
+  - echo "Success"
+  depends_on:
+  - python
+  - hassfest
