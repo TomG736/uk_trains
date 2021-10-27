@@ -34,7 +34,10 @@
         "data": {
           "journeys": "Existing Journeys: Uncheck any journeys you want to remove.",
           "path": "New Journey: Origin station.",
-          "name": "New Journey: Destination (optional)."
+          "name": "New Journey: Destination (optional).",
+          "origin": "Origin station.",
+          "destination": "Destination (optional).",
+          "add_another": "Add another journey?"
         },
         "description": "Remove existing journeys or add a new journey."
       }
