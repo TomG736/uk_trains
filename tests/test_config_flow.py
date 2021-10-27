@@ -1,13 +1,15 @@
 """Tests for the config flow."""
+import logging
 from unittest import mock
 
 from homeassistant.const import CONF_ACCESS_TOKEN, CONF_NAME, CONF_PATH, HTTP_FORBIDDEN, HTTP_OK
 import pytest
 from homeassistant.config_entries import SOURCE_USER
 from homeassistant import data_entry_flow
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.uk_trains import config_flow
-from custom_components.uk_trains.const import DOMAIN, TRANSPORT_API_URL_BASE
+from custom_components.uk_trains.const import CONF_API_PASSWORD, CONF_API_USERNAME, CONF_ORIGIN, CONF_QUERIES, DOMAIN, TRANSPORT_API_URL_BASE
 
 async def test_validate_auth_valid(hass, requests_mock):
     """Test no exception is raised for valid auth."""
@@ -58,14 +60,14 @@ async def test_validate_stations_invalid(hass, requests_mock):
 #     }
 #     assert expected == result
 
-async def test_show_form(hass):
-    """Test that the form is served with no input."""
-    result = await hass.config_entries.flow.async_init(
-        DOMAIN, context={"source": SOURCE_USER}
-    )
+# async def test_show_form(hass):
+#     """Test that the form is served with no input."""
+#     result = await hass.config_entries.flow.async_init(
+#         DOMAIN, context={"source": SOURCE_USER}
+#     )
 
-    assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
-    assert result["step_id"] == SOURCE_USER
+#     assert result["type"] == data_entry_flow.RESULT_TYPE_FORM
+#     assert result["step_id"] == SOURCE_USER
 
 # @patch("custom_components.github_custom.config_flow.validate_auth")
 # async def test_flow_user_init_invalid_auth_token(m_validate_auth, hass):
@@ -81,13 +83,16 @@ async def test_show_form(hass):
 
 
 # @patch("custom_components.github_custom.config_flow.validate_auth")
-# async def test_flow_user_init_data_valid(m_validate_auth, hass):
+# async def test_flow_user_init_data_valid(hass):
 #     """Test we advance to the next step when data is valid."""
 #     _result = await hass.config_entries.flow.async_init(
 #         config_flow.DOMAIN, context={"source": "user"}
 #     )
 #     result = await hass.config_entries.flow.async_configure(
-#         _result["flow_id"], user_input={CONF_ACCESS_TOKEN: "bad"}
+#         _result["flow_id"], user_input={
+#             CONF_API_USERNAME: "usernames",
+#             CONF_API_PASSWORD: "password"
+#         }
 #     )
 #     assert "repo" == result["step_id"]
 #     assert "form" == result["type"]
@@ -177,34 +182,32 @@ async def test_show_form(hass):
 #     assert expected == result
 
 
-# @patch("custom_components.github_custom.sensor.GitHubAPI")
-# async def test_options_flow_init(m_github, hass):
-#     """Test config flow options."""
-#     m_instance = AsyncMock()
-#     m_instance.getitem = AsyncMock()
-#     m_github.return_value = m_instance
+async def test_options_flow_init(hass):
+    """Test config flow options."""
 
-#     config_entry = MockConfigEntry(
-#         domain=DOMAIN,
-#         unique_id="kodi_recently_added_media",
-#         data={
-#             CONF_ACCESS_TOKEN: "access-token",
-#             CONF_REPOS: [{"path": "home-assistant/core", "name": "HA Core"}],
-#         },
-#     )
-#     config_entry.add_to_hass(hass)
-#     assert await hass.config_entries.async_setup(config_entry.entry_id)
-#     await hass.async_block_till_done()
+    config_entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="next_train_from_LBG",
+        data={
+            CONF_API_USERNAME: "usernames",
+            CONF_API_PASSWORD: "password",
+            CONF_QUERIES: [{CONF_ORIGIN: "LBG"}],
+        },
+    )
+    
+    config_entry.add_to_hass(hass)
+    assert await hass.config_entries.async_setup(config_entry.entry_id)
+    await hass.async_block_till_done()
 
-#     # show initial form
-#     result = await hass.config_entries.options.async_init(config_entry.entry_id)
-#     assert "form" == result["type"]
-#     assert "init" == result["step_id"]
-#     assert {} == result["errors"]
-#     # Verify multi-select options populated with configured repos.
-#     assert {"sensor.ha_core": "HA Core"} == result["data_schema"].schema[
-#         "repos"
-#     ].options
+    # show initial form
+    result = await hass.config_entries.options.async_init(config_entry.entry_id)
+    assert "form" == result["type"]
+    assert "init" == result["step_id"]
+    assert {} == result["errors"]
+    # Verify multi-select options populated with configured repos.
+    assert {"sensor.ha_core": "HA Core"} == result["data_schema"].schema[
+        "repos"
+    ].options
 
 
 # @patch("custom_components.github_custom.sensor.GitHubAPI")

@@ -1,4 +1,5 @@
 from copy import deepcopy
+import logging
 from typing import Any, Dict, Optional
 from homeassistant.data_entry_flow import FlowResult
 
@@ -104,6 +105,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         self.config_entry = config_entry
+        logging.warn("Options flow handler!")
 
     async def async_step_init(
         self, user_input: Dict[str, Any] = None

@@ -127,7 +127,6 @@ class RttIoSensor(SensorEntity):
         """Return the unique ID of the sensor."""
         return self._url
 
-
     @property
     def native_value(self):
         """Return the state of the sensor."""
@@ -172,8 +171,6 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
 
     def _update(self):
         """Get the latest live departure data for the specified stop."""
-
-        logging.warn('_update')
 
         self._do_api_request()
         self._next_trains = []

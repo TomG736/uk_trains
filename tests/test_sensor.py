@@ -9,7 +9,6 @@ import json
 async def test_async_update_success(hass, requests_mock):
     """Tests a fully successful async_update."""
 
-    # TODO move to using requests_mock
     with open('tests/testdata/success.json') as fd:
         requests_mock.get(TRANSPORT_API_URL_BASE + 'origin/to/dest', text=fd.read(), status_code=HTTP_OK)
 
