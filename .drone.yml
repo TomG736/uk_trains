@@ -24,7 +24,7 @@ steps:
 - name: result
   image: python:3.9
   commands:
-  - echo "Success"
+    - echo "Success"
   depends_on:
-  - python
-  - hassfest
+    - python
+    - hassfest
