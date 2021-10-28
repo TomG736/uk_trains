@@ -1,5 +1,4 @@
 from copy import deepcopy
-import logging
 from typing import Any, Dict, Optional
 from homeassistant.data_entry_flow import FlowResult
 
@@ -66,7 +65,7 @@ class RTTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             # Validate the path.
             try:
-                await self.hass.async_add_executor_job( validate_stations, self.data[CONF_API_USERNAME], self.data[CONF_API_PASSWORD], user_input[CONF_ORIGIN], user_input.get(CONF_DESTINATION, None), self.hass)
+                await self.hass.async_add_executor_job(validate_stations, self.data[CONF_API_USERNAME], self.data[CONF_API_PASSWORD], user_input[CONF_ORIGIN], user_input.get(CONF_DESTINATION, None), self.hass)
             except ValueError:
                 errors["base"] = "invalid_stations"
 
@@ -91,7 +90,6 @@ class RTTConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional("add_another"): cv.boolean
             }), errors=errors
         )
-
 
     @staticmethod
     @callback
@@ -136,7 +134,11 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 # Remove from our configured journeys.
                 entry = repo_map[entity_id]
                 entry_path = entry.unique_id
-                updated_journeys = [e for e in updated_journeys if e["path"] != entry_path]
+                updated_journeys = [e for e in updated_journeys if not (
+                    (len(CONF_DESTINATION) == 0 and f"{e[CONF_ORIGIN]}" == entry_path)
+                    or
+                    f"{e[CONF_ORIGIN]}/to/{e[CONF_DESTINATION]}" == entry_path
+                )]
 
             if user_input.get(CONF_ORIGIN):
                 # Validate the path.
@@ -149,7 +151,7 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
                 try:
                     await self.hass.async_add_executor_job(validate_stations, username, password, user_input[CONF_ORIGIN], user_input.get(CONF_DESTINATION, ''), self.hass)
                 except ValueError:
-                    errors["base"] = "invalid_path"
+                    errors["base"] = "invalid_stations"
 
                 if not errors:
                     # Add the new journey.
