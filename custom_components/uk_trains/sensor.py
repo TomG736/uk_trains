@@ -209,8 +209,8 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
                         _delta_mins(train["scheduled"]) for train in self._next_trains
                     )
                 else:
-                    self._state = None
-                    self._attr_available = False
+                    self._state = "No valid departures"
+                    self._attr_available = True
 
     @property
     def extra_state_attributes(self):
