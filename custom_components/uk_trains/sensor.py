@@ -39,7 +39,6 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     add_entities(sensors, True)
 
 
-
 async def async_setup_entry(
     hass: core.HomeAssistant,
     config_entry: config_entries.ConfigEntry,
@@ -94,6 +93,7 @@ async def async_setup_platform(
         )
     async_add_entities(sensors, update_before_add=True)
 
+
 class RttIoSensor(SensorEntity):
     """
     Sensor that reads the UK transport web API.
@@ -116,6 +116,7 @@ class RttIoSensor(SensorEntity):
         self._state = None
         self._attr_available = False
         self.hass = hass
+        self._uid = url
 
     @property
     def name(self):
@@ -125,7 +126,7 @@ class RttIoSensor(SensorEntity):
     @property
     def unique_id(self) -> str:
         """Return the unique ID of the sensor."""
-        return self._url
+        return self._uid
 
     @property
     def native_value(self):
@@ -183,7 +184,7 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
                 for departure in self._data["services"]:
                     if departure.get('plannedCancel', False):
                         continue
-                    if not 'locationDetail' in departure:
+                    if 'locationDetail' not in departure:
                         continue
                     self._next_trains.append(
                         {
