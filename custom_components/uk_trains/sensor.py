@@ -169,7 +169,7 @@ class RttIoLiveTrainTimeSensor(RttIoSensor):
             self, hass, sensor_name, api_username, api_password, query_url
         )
         self.update = Throttle(interval)(self._update)
-        self.update()
+        hass.async_add_executor_job(self.update)
 
     def _update(self):
         """Get the latest live departure data for the specified stop."""
