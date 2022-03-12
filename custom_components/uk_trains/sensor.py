@@ -6,7 +6,8 @@ from homeassistant import config_entries, core
 import homeassistant.util.dt as dt_util
 import requests
 from homeassistant.components.sensor import SensorEntity
-from homeassistant.const import HTTP_UNAUTHORIZED, HTTP_OK, TIME_MINUTES
+from http import HTTPStatus
+from homeassistant.const import TIME_MINUTES
 from homeassistant.util import Throttle
 
 from .const import (ATTR_CALLING_AT, ATTR_NEXT_TRAINS, ATTR_STATION_CODE,
@@ -137,9 +138,9 @@ class RttIoSensor(SensorEntity):
         """Perform an API request."""
         self._data = {}
         response = requests.get(self._url, auth=(self._api_username, self._api_password))
-        if response.status_code == HTTP_UNAUTHORIZED:
+        if response.status_code == HTTPStatus.UNAUTHORIZED:
             self._state = "Credentials invalid"
-        elif response.status_code != HTTP_OK:
+        elif response.status_code != HTTPStatus.OK:
             _LOGGER.warning(f"Invalid response from API: {response.status_code}: {self._url}")
         elif "error" in response.json():
             self._state = "Unknown error occurred, ensure station codes are valid"

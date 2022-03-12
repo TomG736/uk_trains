@@ -2,7 +2,8 @@
 import logging
 from unittest import mock
 
-from homeassistant.const import CONF_ACCESS_TOKEN, CONF_NAME, CONF_PATH, HTTP_FORBIDDEN, HTTP_OK
+from homeassistant.const import CONF_ACCESS_TOKEN, CONF_NAME, CONF_PATH
+from http import HTTPStatus
 import pytest
 from homeassistant.config_entries import SOURCE_USER
 from homeassistant import data_entry_flow
@@ -13,21 +14,21 @@ from custom_components.uk_trains.const import CONF_API_PASSWORD, CONF_API_USERNA
 
 async def test_validate_auth_valid(hass, requests_mock):
     """Test no exception is raised for valid auth."""
-    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_OK)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTPStatus.OK)
     
     config_flow.validate_auth("token", "password", hass)
 
 
 async def test_validate_auth_invalid(hass, requests_mock):
     """Test no exception is raised for valid auth."""
-    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_FORBIDDEN)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTPStatus.FORBIDDEN)
     with pytest.raises(ValueError):
         config_flow.validate_auth("token", "password", hass)
 
 async def test_validate_stations_valid(hass, requests_mock):
     """Test no exception is raised for valid auth."""
-    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_OK)
-    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS/to/HML', text='', status_code=HTTP_OK)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTPStatus.OK)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS/to/HML', text='', status_code=HTTPStatus.OK)
     
     config_flow.validate_stations("token", "password", 'EUS', None, hass)
     config_flow.validate_stations("token", "password", 'EUS', 'HML', hass)
@@ -35,8 +36,8 @@ async def test_validate_stations_valid(hass, requests_mock):
 
 async def test_validate_stations_invalid(hass, requests_mock):
     """Test no exception is raised for valid auth."""
-    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTP_FORBIDDEN)
-    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS/to/HML', text='', status_code=HTTP_FORBIDDEN)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS', text='', status_code=HTTPStatus.FORBIDDEN)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'EUS/to/HML', text='', status_code=HTTPStatus.FORBIDDEN)
     with pytest.raises(ValueError):
         config_flow.validate_stations("token", "password", 'EUS', None, hass)
     with pytest.raises(ValueError):

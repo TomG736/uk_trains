@@ -6,7 +6,7 @@ import homeassistant.helpers.config_validation as cv
 import requests
 import voluptuous as vol
 from homeassistant import config_entries
-from homeassistant.const import HTTP_OK
+from http import HTTPStatus
 from homeassistant.core import callback
 from homeassistant.helpers.entity_registry import (
     async_entries_for_config_entry, async_get_registry)
@@ -25,13 +25,13 @@ AUTH_SCHEMA = vol.Schema(
 
 def validate_auth(username, password, hass=None):
     response = requests.get(TRANSPORT_API_URL_BASE + 'EUS', auth=(username, password))
-    if response.status_code != HTTP_OK:
+    if response.status_code != HTTPStatus.OK:
         raise ValueError('Auth Failed')
 
 
 def validate_stations(username, password, orig, dest, hass):
     response = requests.get(TRANSPORT_API_URL_BASE + orig + (f"/to/{dest}" if dest else ''), auth=(username, password))
-    if response.status_code != HTTP_OK:
+    if response.status_code != HTTPStatus.OK:
         raise ValueError('Failed')
 
 

@@ -1,6 +1,6 @@
 """Tests for the sensor module."""
 
-from homeassistant.const import HTTP_OK, HTTP_UNAUTHORIZED
+from http import HTTPStatus
 from custom_components.uk_trains.const import TRANSPORT_API_URL_BASE
 from custom_components.uk_trains import sensor
 #from requests import Response
@@ -10,7 +10,7 @@ async def test_async_update_success(hass, requests_mock):
     """Tests a fully successful async_update."""
 
     with open('tests/testdata/success.json') as fd:
-        requests_mock.get(TRANSPORT_API_URL_BASE + 'origin/to/dest', text=fd.read(), status_code=HTTP_OK)
+        requests_mock.get(TRANSPORT_API_URL_BASE + 'origin/to/dest', text=fd.read(), status_code=HTTPStatus.OK)
 
     custom_sensor = sensor.RttIoLiveTrainTimeSensor(hass, 'username', 'password', 'origin', 'dest', 10)
     await custom_sensor.async_device_update()
@@ -139,7 +139,7 @@ async def test_async_update_success(hass, requests_mock):
 async def test_async_update_failed(hass, requests_mock):
     """Tests a failed async_update."""
     
-    requests_mock.get(TRANSPORT_API_URL_BASE + 'origin/to/dest', text='', status_code=HTTP_UNAUTHORIZED)
+    requests_mock.get(TRANSPORT_API_URL_BASE + 'origin/to/dest', text='', status_code=HTTPStatus.UNAUTHORIZED)
     
     custom_sensor = sensor.RttIoLiveTrainTimeSensor(hass, 'username', 'password', 'origin', 'dest', 10)
     await custom_sensor.async_device_update()
